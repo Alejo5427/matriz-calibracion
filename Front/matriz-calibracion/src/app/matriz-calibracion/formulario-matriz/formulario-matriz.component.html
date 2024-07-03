@@ -1,0 +1,1538 @@
+
+<div class="col">
+  <shared-nav-bar></shared-nav-bar>
+</div>
+
+<h1 class="mt-3"style="text-align: center ">Saludos, {{gestorSeleccionado}}!</h1>
+
+<hr>
+<div class="row">
+  <!-- Texto inicial -->
+  <h2 style="text-align: center; padding: em 0">Matriz de Calibración</h2>
+</div>
+<hr>
+<form #validarFormMatriz="ngForm" [formGroup]="formMatriz" (ngSubmit)="enviarForm()" autocomplete="off">
+<div class="row" *ngIf="visualizar;else formularioGestor">
+    <div class="col-10 bordeFormulario">
+              <!-- Ingreso de datos del formulario -->
+            <div class="row" style="border: 1px">
+              <!-- Fecha inteaccion -->
+            <div class="mb-3 row">
+                <label class="col-3 col-form-label bordeFormulario">Fecha Interacción</label>
+                <div class="col-9">
+
+
+                    <input type="date"
+                          class="form-control bordeFormulario"
+                          formControlName="fechaInteraccion"
+                          placeholder="Deme la fecha"
+                          required>
+
+
+                          <span *ngIf="campoValido('fechaInteraccion')"
+                          class="form-text text-danger">
+                            {{obtenerTipoValidacion('fechaInteraccion')}}
+                          </span>
+
+                </div>
+            </div>
+             <!-- Ingreso dato del nombre del gestor de experiencia (Apartado de Evaluadores y Admins) -->
+            <div class="mb-3 row" *ngIf="visualizar; else GestorElegidoAutomaticamente">
+                 <label class="col-sm-3 col-form-label bordeFormulario">Nombre Gestor Experiencia</label>
+                <div class="col-sm-9">
+                  <select class="form-select bordeFormulario mb-2" name="Elegir" formControlName="nombre">
+                      <option *ngFor="let nombre of datosGestor"
+                      [value]="nombre.Usuario"
+                      style="text-align: center">
+                        {{nombre.Usuario}}
+                      </option>
+                  </select>
+                </div>
+            </div>
+
+            <!-- Eleccion de gestor automaticamente (Esto es debido a que si es gestor solo puede elegirse a el mismo) -->
+            <ng-template #GestorElegidoAutomaticamente>
+              <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label bordeFormulario">Nombre Gestor Experiencia</label>
+                <div class="col-sm-9">
+                  <select class="form-select bordeFormulario mb-2" name="Elegir" formControlName="nombre">
+                      <option
+                      [value]="gestorSeleccionado"
+                      style="text-align: center">
+                        {{gestorSeleccionado}}
+                      </option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+            <!-- Ingreso del ID de interaccion -->
+            <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label bordeFormulario">ID Interacción</label>
+                <div class="col-sm-9">
+                    <input type="text"
+                          class="form-control bordeFormulario"
+                          formControlName="idInteraccion"
+                          placeholder="Ingrese ID de interacción">
+
+                          <span *ngIf="campoValido('idInteraccion')"
+                          class="form-text text-danger">
+                            {{obtenerTipoValidacion('idInteraccion')}}
+                          </span>
+                </div>
+            </div>
+              <!-- Ingreso de numero de interaccion -->
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label bordeFormulario">Numero Interacción</label>
+              <div class="col-sm-9">
+                    <input type="number"
+                          class="form-control bordeFormulario"
+                          formControlName="numeroContacto"
+                          placeholder="Ingrese numero">
+
+                          <span *ngIf="campoValido('numeroContacto')"
+                          class="form-text text-danger">
+                            {{obtenerTipoValidacion('numeroContacto')}}
+                          </span>
+                </div>
+            </div>
+            <!-- Ingreso del nombre de evaluador -->
+           <div class="mb-3 row" *ngIf="editar; else EvaluadorElegidoAutomaticamente">
+                 <label class="col-sm-3 col-form-label bordeFormulario">Evaluador</label>
+                <div class="col-sm-9">
+                  <select class="form-select bordeFormulario mb-2" name="Elegir" formControlName="evaluador">
+                      <option *ngFor="let nombre of datosEvaluador"
+                      [value]="nombre.Usuario"
+                      style="text-align: center">
+                        {{nombre.Usuario}}
+                      </option>
+                  </select>
+                </div>
+            </div>
+
+            <!-- El evaluador solo puede elegirse al mismo para evitar malentendidos -->
+            <ng-template #EvaluadorElegidoAutomaticamente>
+              <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label bordeFormulario">Evaluador</label>
+                <div class="col-sm-9">
+                  <select class="form-select bordeFormulario mb-2" name="Elegir" formControlName="evaluador">
+                      <option
+                      [value]="gestorSeleccionado"
+                      style="text-align: center">
+                        {{evaluadorSeleccionado}}
+                      </option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+        </div>
+
+      </div>
+        <!-- Nota total y el porcentaje de calificacion -->
+      <div class="col-1 bordeFormulario" style="padding: 7em 0">
+        <h4>Nota total</h4>
+      </div>
+
+      <div class="col-1 bordeFormulario" style="padding: 7em 0;">
+        <h4>
+          {{notaTotal}}%
+        </h4>
+      </div>
+
+      <div class="col-12">
+        <div class="row">
+          <div>
+            <!-- Diseño de items, criterios y ponderacion -->
+          </div>
+          <h2 class="col-4 bordeFormulario">Pilar</h2>
+          <h2 class="col-4 bordeFormulario">Ítems</h2>
+          <h2 class="col-2 bordeFormulario">Criterios</h2>
+          <h2 class="col-2 bordeFormulario">Ponderación</h2>
+
+        </div>
+      </div>
+      <!-- Titulacion de el primer Pilar -->
+      <div class="bordeFormulario">
+        <div class="col mt-3">
+          <h2 style="text-align: center">Cercanía y Pasión</h2>
+        </div>
+      </div>
+      <!-- Primer criterio: Dar la bienvenida -->
+      <div class="col-10">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <!-- Titulo -->
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+
+          Dar la bienvenida</h2>
+
+          <!-- Items y popover  -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="El saludo está automatizado desde el inicio del chat. Además para transferir, se envía automáticamente la Gestora. Por lo tanto solo se afecta en aquellos casos, donde sea retoma de clientes o escenarios excepcionales donde se deba saludar y no se haga. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utiliza frase de saludo</button>
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Hace referencia a mencionar la marca de Fájate, Delié y Fájate For men en el saludo y despedida. Ambos parametrizados desde el BOT.
+            Se afecta en su defecto cuando aplique mencionar las marcas y no se realice"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Identifica / Representa la marca</button>
+
+
+          </div>
+        <!-- Select de si Cumple o no el item -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select  mb-2 mt-1 bordeFormulario" name="Elegir"
+            formControlName="item1">
+              <option  value=1 style="text-align: center" selected>Cumple</option>
+              <option value=0 style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-2" name="Elegir"
+            formControlName="item2">
+              <option value=1 style="text-align: center" selected>Cumple</option>
+              <option value=0 style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-1 bordeFormulario">
+        <h1>{{porcentajeCrit1}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton1" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(1)">Restar</button>
+          <button *ngIf="bloquearBoton1"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(1)"> + </button>
+        </div>
+      </div>
+      <h1 class=" col-1 bordePonderacion"></h1>
+
+      <!---Segundo criterio ----->
+
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <h2 class="col-5 d-flex align-items-center justify-content-center " style="border: 2px solid rgb(85, 172, 207); margin: 0%; border-bottom: white; border-right: white">
+            Escuchar y Fidelizar</h2>
+
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="La comunicación es acorde y fluida, se responde según lo preguntado por el cliente o se utilizan palabras y frases acordes al contexto de la interacción"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Lee y entiende la solicitud</button>
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Se basa en el modelo de atención y las preguntas de exploración que se debe realizar según sea la solicitud o inconformidad. Esto para levantar información suficiente para documentar, gestionar o vender."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Realiza Preguntas claves</button>
+            </div>
+
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select bordeFormulario mb-3 mt-1   " name="Elegir"
+            formControlName="item3">
+              <option  value="1" style="text-align: center" selected>Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-3" name="Elegir"
+            formControlName="item4">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <!-- Porcentaje de ponderado y boton de resta -->
+      <div class="col-1 bordeFormulario" style="padding: 1em 0; ">
+        <h1>{{porcentajeCrit2}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton2" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(2)">Restar</button>
+          <button *ngIf="bloquearBoton2"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(2)"> + </button>
+        </div>
+      </div>
+      <h1 class="col-1 bordePonderacion"></h1>
+
+
+
+      <!-- Tercer criterio (Asesorar) -->
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+          Asesorar</h2>
+            <!-- Botones y popover -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Amabilidad: Utiliza palabras para dar claridad, tranquilizar, aumentar el deseo. Se demuestra una actitud sincera Trato Cordial: Siempre está conectada y disponible para atender las preguntas del cliente y evita frases como: 'ya se lo dije' 'Como le dije anteriormente' entre otras"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Amabilidad - trato cordial</button>
+            <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="
+            Plural corporativo: En escenarios donde sea necesario utilizar frases como: Ofrecemos disculpas en nombre de la compañía, vamos a solucionar la situación, estamos trabajando para ayudarle' entre otras. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Utiliza Plural Corporativo</button>
+            <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Segunda /  tercera persona: Durante toda la conversación utiliza siempre la primera persona o la tercera persona y no las mezcla.
+            Segunda persona: Tú
+            Tercera persona: usted"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Segunda o tercera persona</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip="dentro de la interacción no utiliza mayúsculas sostenidas o texto subrayado en Negrita Sostenida.
+            Solo se admite la negrita para resaltar el nombre de la marca. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No utilizar mayúsculas / Negrita en la interacción</button>
+            <button class="col-12 mt-3 bordeFormulario " type="button" mat-raised-button
+            matTooltip="Está conectada y disponble, y no hace que el cliente repita información que este ya ha brindado o que puede encontrar en los sistemas de información. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Evitar repetir información</button>
+            <button class="col-12 mt-3 bordeFormulario mb-2" type="button" mat-raised-button
+            matTooltip="Utilización de Emojis para dinamizar y generar cercanía con el cliente es indispensable, consultar la matriz de Uso de Emojis. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utilizar emojis</button>
+          </div>
+
+          <!-- Selectores de los botones -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select bordeFormulario mb-1 mt-1" name="Elegir"
+            formControlName="item5" >
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-2" name="Elegir"
+            formControlName="item6">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item7">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3 mb-2" name="Elegir"
+            formControlName="item8">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <!-- Porcentaje de ponderacion  y boton de restar -->
+      <div class="col-1 bordeFormulario" style="padding: 4em 0; ">
+        <h1>{{porcentajeCrit3}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton3" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(3)">Restar</button>
+          <button *ngIf="bloquearBoton3"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(3)"> + </button>
+        </div>
+      </div>
+      <h1 class="col-1 bordePonderacion"></h1>
+
+      <!-- Cuarto criterio -->
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+          Ofertar y Fidelizar</h2>
+
+          <div class="col-5 bordeFormulario">
+            <!-- Botones de items  y popover -->
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Cuando identifica correctamente la necesidad del cliente, ofrece la referencia correcta a su necesidad"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Oferta producto correcto</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip="Envía información precisa de la referencia de acuerdo a la necesidad del cliente. Evita enviar párrafos extensos-"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Menciona características - beneficios o ventajas acordes al producto y necesidad</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip="Todo chat que implique una venta es importante cerrarla a través de este medio. Siendo el caso que el cliente no lo desee, se debe manejar la objeción y debe quedar evidenciado que se hizo esta gestión. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Maneja la objeción para que el cliente compre por WhatsApp</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip="En toda interacción, durante el proceso de gestión, se debe garantizar enviar al cliente comunicaciones sobre Autogestión, nuevas colecciones y / o Promociones adicionales. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Incentiva el uso de APP´s, sitio web, autogestión, promociones  o colecciones</button>
+            <button class="col-12 mt-3 mb-1 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip="Toda intensión de venta por Chat, se debe garantizar el ofrecimiento adecuado para aumentar la efectividad de venta de productos complementarios al inicial. Debe quedar evidenciada la oferta de estos productos."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utiliza técnica para vender producto complementario / Venta cruzada
+          </button>
+          </div>
+
+          <!-- Select de los items -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select bordeFormulario  mt-1" name="Elegir"
+            formControlName="item9">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item10">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item11">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item12">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item13">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <!-- Porcentaje de ponderacion y la resta del porcentaje -->
+      <div class="col-1 bordeFormulario" style="padding: 6em 0; ">
+        <h1>{{porcentajeCrit4}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton4" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(4)">Restar</button>
+          <button *ngIf="bloquearBoton4"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(4)"> + </button>
+        </div>
+      </div>
+      <h1 class="col-1 bordePonderacion">{{porcentajePilar1}}%</h1>
+
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <!-- Quinto Criterio -->
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+
+          Despedida</h2>
+
+          <!-- Items y popover  -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Venta: Siempre se debe realizar el resumen de la venta con todos los datos del cliente y el detalle de los artículos que lleva"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Resume y confirma la información brindada</button>
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Para toda interacción de la cuál se genere Radicado de CRM o Guía de entrega de Coordinadora, se le debe compartir al cliente dicho número de gestión."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Brinda numero de gestión / Guia / PQRS</button>
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Antes de finalizar la interacción se le debe extender al cliente la pregunta: ¿He sido clara con la información?
+            Una vez conteste, se extiende la pregunta ¿Desea que le ayude en algo más? "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Pregunta si la información fue clara y además si dudas adicionales por separado</button>
+
+
+          </div>
+        <!-- Select de si Cumple o no el item -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+            formControlName="item14">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-2" name="Elegir"
+            formControlName="item15">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-2" name="Elegir"
+            formControlName="item16">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <!-- Porcentaje de ponderado y resta de porcentaje -->
+      <div class="col-1 bordeFormulario" style="padding: 2em 0; ">
+        <h1>{{porcentajeCrit5}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton5" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(5)">Restar</button>
+          <button *ngIf="bloquearBoton5"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(5)"> + </button>
+        </div>
+      </div>
+      <h1 class="col-1 bordePonderacion"></h1>
+
+      <!-- Segundo pilar -->
+      <div class="bordeFormulario">
+        <div class="col mt-3">
+          <h2 style="text-align: center bordeFormulario">Actitud de servicio / Claridad</h2>
+        </div>
+      </div>
+
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <!-- Sexto criterio -->
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+              Ejecución de procesos
+            </h2>
+
+          <!-- Items y popover  -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No extender la llamada / interacción innecesariamente </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Aplica para todos los procedimientos que deba realizar el equipo de experiencia para poderle dar la solución al cliente. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Realiza el proceso establecido sin afectar la solución</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button"  mat-raised-button style="font-size:13px"
+            matTooltip="Toma los datos esenciales del cliente para registrar el contacto en b2chat"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Registra datos del cliente en B2Chat</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="La utilización de Tags es indispensable para conocer la data de los motivos de consulta de nuestros clientes. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utiliza Tags</button>
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Asignar el Tag de manera correcta de acuerdo a la consulta inicial del cliente, por interacción se pueden asignar hasta 3 tags. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utiliza  tags correctos</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="El Registro de PAQR en el CRM debe ser completa, clara y detallada. Que permita el análisis, gestión y solución correcta al cliente.
+            Aplica tambien para el registro de actividades que sucedan con dicha PQR"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Registra en PQR en CRM correctamente</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Recopila todos los datos necesarios para documentar una venta.
+            Utiliza el sistema de información correcto para hacerlo y no genera ninguna afectación en el proceso."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Documenta correctamente la venta</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Transfiere correctamente</button>
+
+            <button class="col-12 mt-3 mb-2 bordeFormulario" type="button"  mat-raised-button style="font-size:13px"
+            matTooltip="Aplica para cuando la no utilización o el uso inapropiado de los sistemas de información afectar la solución o solicitud del cliente, además, genera reprocesos internos o extiende la interacción innecesariamente"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No usa / Uso apropiado de herramientas de información</button>
+
+
+          </div>
+        <!-- Select de si Cumple o no el item -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+            formControlName="item17">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-2  mt-3" name="Elegir"
+            formControlName="item18">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item19">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item20">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item21">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item22">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item23">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-2 mb-3" name="Elegir"
+            formControlName="item24">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-2 mb-2" name="Elegir"
+            formControlName="item25">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+
+          </div>
+
+        </div>
+      </div>
+      <!-- Muestra de porcentaje y resta de boton -->
+      <div class="col-1 bordeFormulario" style="padding: 11em 0; ">
+        <h1>{{porcentajeCrit6}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton6" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(6)">Restar</button>
+          <button *ngIf="bloquearBoton6"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(6)"> + </button>
+        </div>
+      </div>
+      <h1 class="col-1 bordeFormulario" style="padding: 8em 0">{{porcentajePilar2}}%</h1>
+
+
+      <!-- Tercer Pilar -->
+      <div class="bordeFormulario">
+        <div class="col mt-3">
+          <h2 style="text-align: center">Impecabilidad</h2>
+        </div>
+      </div>
+
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+
+          </div>
+          <!-- Septimo pilar -->
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+              Tiempo e información precisa
+            </h2>
+
+          <!-- Items y popover  -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Cuando se nos asigna el chat del cliente con los datos solicitados por el Bot, nuestra primera respuesta debe darse en el tiempo establecido en el manual de atención."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Envía primer mensaje en el tiempo estipulado.
+          </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+            matTooltip="Una vez iniciada la conversación entre el gestor y el cliente, debemos responder cada mensaje del cliente en en el tiempo establecido en el Manual de atención de Chat"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Responde mensajes durante la interacción en el tiempo estipulado.
+          </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Aplica para cuando:
+            1. el cliente escribe, es asignado a un gestor y este no atiende la interacción y el cliente abandona el chat.
+
+            2. Se está en conversación con el cliente y el gestor abandona el chat generando inconformidad en el cliente. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Gestor no abandona al cliente
+          </button>
+
+          <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="El gestor envía correctamente los 2 mensajes de inactividad del cliente
+
+            'mensaje 1: 1 hora' ,
+            'mensaje 2: 3 horas'
+
+            Después de este último mensaje el gestor cierra el chat por inactividad del cliente"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Cierra chat por abandono de cliente
+          </button>
+
+          <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Brindar información correcta
+          </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Brindar información Completa
+          </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No brinda información confidencial
+          </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Aplica para procesos que solo se puedan realizar en tienda.
+
+            Si es un proceso de venta que el cliente desea finalizar en la tienda y no hay manejo de objeción, se analiza bajo el ítem: 'manejo de objeción para compra por WhatsApp'"
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Enviar al cliente a tienda cuando aplique.
+          </button>
+
+          <button class="col-12 mt-3 mb-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Cuando se presentan 4 o más errores de ortografía o redacción se afecta.
+            Si posee menos errores pero afecta la solución del cliente se afecta. "
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No posee errores Ortográficos o de redacción (Afectar si posee 4 o más)
+          </button>
+
+          <button class="col-12 mt-1 mb-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+            matTooltip="Se afecta cuando se utilizan emojis que propicien una conversación de violencia, acoso, sexualidad y ofensas raciales, étnicas o culturales."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Utilizar emojis apropiados
+          </button>
+
+
+          </div>
+        <!-- Select de si Cumple o no el item -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+            formControlName="item26">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mb-2  mt-3" name="Elegir"
+            formControlName="item27">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item28">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item29">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item30">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item31">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item32">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-3" name="Elegir"
+            formControlName="item33">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-2 " name="Elegir"
+            formControlName="item34">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario  mt-2 " name="Elegir"
+            formControlName="item35">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <!-- Muestra de porcentaje y resta con el boton -->
+      <div class="col-1 bordePonderacion" style="padding: 16em 0;">
+        <h1>{{porcentajeCrit7}}%</h1>
+        <div class="col-12">
+          <button type="button" [disabled]="bloquearBoton7" class="btn btn-outline-primary btn-sm col-8" (click)="restarPorcentaje(7)">Restar</button>
+          <button *ngIf="bloquearBoton7"  class="btn btn-outline-primary btn-sm col-4" (click)="sumarPorcentaje(7)"> + </button>
+        </div>
+      </div>
+
+      <!-- Porcentaje del tercer pilar -->
+      <h1 class="col-1 bordePonderacion" style="padding: 10em 0">{{porcentajePilar3}}%</h1>
+
+      <div class="col-10 bordeFormulario">
+
+        <div class="row">
+          <div>
+            <!-- Octavo pilar -->
+          </div>
+          <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+          Actitud de servicio inapropiadas</h2>
+              <!-- Botones de items y popover -->
+          <div class="col-5 bordeFormulario">
+            <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+            matTooltip="1. No utiliza tecnicismos que den como resultado una incorrecta asesoría.
+            2. Confunde el nombre del cliente o sus solicitudes.
+            3. No utiliza palabras que denotes exclusión, racismo, violencia, sexualidad, acoso."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Se dirige de forma apropiada al cliente</button>
+
+            <button class="col-12 mt-3 bordeFormulario"  type="button" style="font-size: 12px" mat-raised-button
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No confronta Confrontar al cliente</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">No utiliza Lenguaje soez</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip=""
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Comentarios adversos a la empresa</button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+            matTooltip="Se toma como maltrato al cliente, demostrando que no se desea atender la interacción."
+            matTooltipPosition="above"
+            aria-label="Button that displays a tooltip when focused or hovered over">Terminar interacción antes de la solución / cierre de chart sin solución
+          </button>
+          </div>
+
+
+
+          <!-- Select de opciones de los items -->
+          <div class="col-sm-2 bordeFormulario">
+            <select class="form-select bordeFormulario mb-1 mt-2" name="Elegir"
+            formControlName="item36" >
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item37">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-3" name="Elegir"
+            formControlName="item38">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-2 mb-3 " name="Elegir"
+            formControlName="item39">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+            <select class="form-select bordeFormulario mt-2 " name="Elegir"
+            formControlName="item40">
+              <option value="1" style="text-align: center">Cumple</option>
+              <option value="0" style="text-align: center">No Cumple</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+      <h1 class="col-1 bordePonderacion" style=" border-bottom: #55accf 2px solid"></h1>
+      <h1 class="col-1 bordePonderacion" style="top: 5em 0; border-bottom: #55accf 2px solid"></h1>
+
+          <!-- Campo de observaciones que es un textarea -->
+          <mat-form-field class="col-12 mt-5" appearance="outline">
+            <mat-label>Observaciones / Comentarios adicionales</mat-label>
+            <textarea matInput formControlName="observaciones"></textarea>
+          </mat-form-field>
+          <!-- Boton para enviar el formulario y guardar los datos -->
+      <div class="row">
+        <div class="col-12">
+            <button type="submit"
+                    class="btn btn-outline-primary float-end col-12" [disabled]="!validarFormMatriz.valid">
+                Guardar
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Este Ng-template tiene como funcion mostrar los items, pilares y porcentaje al gestor aunque no puede mandar ningun formulario ni completarlo -->
+  <ng-template #formularioGestor>
+    <div class="row">
+        <div class="col-12 bordeFormulario" style="padding: 7em 0;">
+          <h1>
+            {{notaTotal}}%
+          </h1>
+        </div>
+
+        <div class="col-12">
+
+          <div class="row">
+            <div>
+              <!-- Diseño de items, criterios y ponderacion -->
+            </div>
+            <h2 class="col-4 bordeFormulario">Pilar</h2>
+            <h2 class="col-4 bordeFormulario">Ítems</h2>
+            <h2 class="col-2 bordeFormulario">Criterios</h2>
+            <h2 class="col-2 bordeFormulario">Ponderación</h2>
+
+          </div>
+        </div>
+        <!-- Titulacion de el primer Pilar -->
+        <div class="bordeFormulario">
+          <div class="col mt-3">
+            <h2 style="text-align: center">Cercanía y Pasión</h2>
+          </div>
+        </div>
+        <!-- Primer criterio: Dar la bienvenida -->
+        <div class="col-10">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <!-- Titulo -->
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+
+            Dar la bienvenida</h2>
+
+            <!-- Items y popover  -->
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="El saludo está automatizado desde el inicio del chat. Además para transferir, se envía automáticamente la Gestora. Por lo tanto solo se afecta en aquellos casos, donde sea retoma de clientes o escenarios excepcionales donde se deba saludar y no se haga. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utiliza frase de saludo</button>
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Hace referencia a mencionar la marca de Fájate, Delié y Fájate For men en el saludo y despedida. Ambos parametrizados desde el BOT.
+              Se afecta en su defecto cuando aplique mencionar las marcas y no se realice"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Identifica / Representa la marca</button>
+
+
+            </div>
+          <!-- Select de si Cumple o no el item -->
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select  mb-2 mt-1 bordeFormulario" name="Elegir"
+              formControlName="item1">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-2" name="Elegir"
+              formControlName="item2">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <!-- <button (click)="restarPorcentaje(5)">Restar Porcentaje</button> -->
+            </div>
+          </div>
+        </div>
+        <div class="col-1 bordeFormulario">
+          <h1>{{porcentajeCrit1}}%</h1>
+          <button type="button" [disabled]="bloquearBoton1" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(1)">Restar</button>
+        </div>
+        <h1 class=" col-1 bordePonderacion"></h1>
+
+        <!---Segundo criterio ----->
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <h2 class="col-5 d-flex align-items-center justify-content-center " style="border: 2px solid rgb(85, 172, 207); margin: 0%; border-bottom: white; border-right: white">
+              Escuchar y Fidelizar</h2>
+
+              <div class="col-5 bordeFormulario">
+                <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+                matTooltip="La comunicación es acorde y fluida, se responde según lo preguntado por el cliente o se utilizan palabras y frases acordes al contexto de la interacción"
+                matTooltipPosition="above"
+                aria-label="Button that displays a tooltip when focused or hovered over">Lee y entiende la solicitud</button>
+                <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+                matTooltip="Se basa en el modelo de atención y las preguntas de exploración que se debe realizar según sea la solicitud o inconformidad. Esto para levantar información suficiente para documentar, gestionar o vender."
+                matTooltipPosition="above"
+                aria-label="Button that displays a tooltip when focused or hovered over">Realiza Preguntas claves</button>
+              </div>
+
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select bordeFormulario mb-3 mt-1   " name="Elegir"
+              formControlName="item3">
+                <option  value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-3" name="Elegir"
+              formControlName="item4">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+            <!-- Tercer criterio  -->
+          </div>
+        </div>
+        <div class="col-1 bordeFormulario" style="padding: 1em 0; ">
+          <h1>{{porcentajeCrit2}}%</h1>
+          <button type="button" [disabled]="bloquearBoton2" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(2)">Restar</button>
+        </div>
+        <h1 class="col-1 bordePonderacion"></h1>
+
+
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+            Asesorar</h2>
+
+            <div class="col-5 bordeFormulario">
+              <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Amabilidad: Utiliza palabras para dar claridad, tranquilizar, aumentar el deseo. Se demuestra una actitud sincera Trato Cordial: Siempre está conectada y disponible para atender las preguntas del cliente y evita frases como: 'ya se lo dije' 'Como le dije anteriormente' entre otras"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Amabilidad - trato cordial</button>
+              <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="
+              Plural corporativo: En escenarios donde sea necesario utilizar frases como: Ofrecemos disculpas en nombre de la compañía, vamos a solucionar la situación, estamos trabajando para ayudarle' entre otras. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Utiliza Plural Corporativo</button>
+              <button class="col-4 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Segunda /  tercera persona: Durante toda la conversación utiliza siempre la primera persona o la tercera persona y no las mezcla.
+              Segunda persona: Tú
+              Tercera persona: usted"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Segunda o tercera persona</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="dentro de la interacción no utiliza mayúsculas sostenidas o texto subrayado en Negrita Sostenida.
+              Solo se admite la negrita para resaltar el nombre de la marca. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No utilizar mayúsculas / Negrita en la interacción</button>
+              <button class="col-12 mt-3 bordeFormulario " type="button" mat-raised-button
+              matTooltip="Está conectada y disponble, y no hace que el cliente repita información que este ya ha brindado o que puede encontrar en los sistemas de información. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Evitar repetir información</button>
+              <button class="col-12 mt-3 bordeFormulario mb-2" type="button" mat-raised-button
+              matTooltip="Utilización de Emojis para dinamizar y generar cercanía con el cliente es indispensable, consultar la matriz de Uso de Emojis. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utilizar emojis</button>
+            </div>
+
+
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select bordeFormulario mb-1 mt-1" name="Elegir"
+              formControlName="item5" >
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2" name="Elegir"
+              formControlName="item6">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3" name="Elegir"
+              formControlName="item7">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3 mb-2" name="Elegir"
+              formControlName="item8">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-1 bordeFormulario" style="padding: 4em 0; ">
+          <h1>{{porcentajeCrit3}}%</h1>
+          <button type="button" [disabled]="bloquearBoton3" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(3)">Restar</button>
+        </div>
+        <h1 class="col-1 bordePonderacion"></h1>
+
+        <!-- Cuarto criterio del pilar -->
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+            Ofertar y Fidelizar</h2>
+
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Cuando identifica correctamente la necesidad del cliente, ofrece la referencia correcta a su necesidad"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Oferta producto correcto</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip="Envía información precisa de la referencia de acuerdo a la necesidad del cliente. Evita enviar párrafos extensos-"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Menciona características - beneficios o ventajas acordes al producto y necesidad</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip="Todo chat que implique una venta es importante cerrarla a través de este medio. Siendo el caso que el cliente no lo desee, se debe manejar la objeción y debe quedar evidenciado que se hizo esta gestión. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Maneja la objeción para que el cliente compre por WhatsApp</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip="En toda interacción, durante el proceso de gestión, se debe garantizar enviar al cliente comunicaciones sobre Autogestión, nuevas colecciones y / o Promociones adicionales. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Incentiva el uso de APP´s, sitio web, autogestión, promociones  o colecciones</button>
+              <button class="col-12 mt-3 mb-1 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip="Toda intensión de venta por Chat, se debe garantizar el ofrecimiento adecuado para aumentar la efectividad de venta de productos complementarios al inicial. Debe quedar evidenciada la oferta de estos productos."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utiliza técnica para vender producto complementario / Venta cruzada
+            </button>
+            </div>
+
+
+
+
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select bordeFormulario mb-1 mt-1" name="Elegir"
+              formControlName="item9">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2" name="Elegir"
+              formControlName="item10">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2" name="Elegir"
+              formControlName="item11">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3" name="Elegir"
+              formControlName="item12">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3 mb-2" name="Elegir"
+              formControlName="item13">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-1 bordeFormulario" style="padding: 6em 0; ">
+          <h1>{{porcentajeCrit4}}%</h1>
+          <button type="button" [disabled]="bloquearBoton4" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(4)">Restar</button>
+        </div>
+        <h1 class="col-1 bordePonderacion">{{porcentajePilar1}}%</h1>
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <!-- Titulo -->
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+
+            Despedida</h2>
+
+            <!-- Items y popover  -->
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Venta: Siempre se debe realizar el resumen de la venta con todos los datos del cliente y el detalle de los artículos que lleva"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Resume y confirma la información brindada</button>
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Para toda interacción de la cuál se genere Radicado de CRM o Guía de entrega de Coordinadora, se le debe compartir al cliente dicho número de gestión."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Brinda numero de gestión / Guia / PQRS</button>
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Antes de finalizar la interacción se le debe extender al cliente la pregunta: ¿He sido clara con la información?
+              Una vez conteste, se extiende la pregunta ¿Desea que le ayude en algo más? "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Pregunta si la información fue clara y además si dudas adicionales por separado</button>
+
+
+            </div>
+          <!-- Select de si Cumple o no el item -->
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+              formControlName="item14">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-2" name="Elegir"
+              formControlName="item15">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-2" name="Elegir"
+              formControlName="item16">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-1 bordeFormulario" style="padding: 2em 0; ">
+          <h1>{{porcentajeCrit5}}%</h1>
+          <button type="button" [disabled]="bloquearBoton5" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(5)">Restar</button>
+        </div>
+        <h1 class="col-1 bordePonderacion"></h1>
+
+
+        <div class="bordeFormulario">
+          <div class="col mt-3">
+            <h2 style="text-align: center bordeFormulario">Actitud de servicio / Claridad</h2>
+          </div>
+        </div>
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <!-- Titulo -->
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+                Ejecución de procesos
+              </h2>
+
+            <!-- Items y popover  -->
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No extender la llamada / interacción innecesariamente </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Aplica para todos los procedimientos que deba realizar el equipo de experiencia para poderle dar la solución al cliente. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Realiza el proceso establecido sin afectar la solución</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button"  mat-raised-button style="font-size:13px"
+              matTooltip="Toma los datos esenciales del cliente para registrar el contacto en b2chat"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Registra datos del cliente en B2Chat</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="La utilización de Tags es indispensable para conocer la data de los motivos de consulta de nuestros clientes. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utiliza Tags</button>
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Asignar el Tag de manera correcta de acuerdo a la consulta inicial del cliente, por interacción se pueden asignar hasta 3 tags. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utiliza  tags correctos</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="El Registro de PAQR en el CRM debe ser completa, clara y detallada. Que permita el análisis, gestión y solución correcta al cliente.
+              Aplica tambien para el registro de actividades que sucedan con dicha PQR"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Registra en PQR en CRM correctamente</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Recopila todos los datos necesarios para documentar una venta.
+              Utiliza el sistema de información correcto para hacerlo y no genera ninguna afectación en el proceso."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Documenta correctamente la venta</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Transfiere correctamente</button>
+
+              <button class="col-12 mt-3 mb-2 bordeFormulario" type="button"  mat-raised-button style="font-size:13px"
+              matTooltip="Aplica para cuando la no utilización o el uso inapropiado de los sistemas de información afectar la solución o solicitud del cliente, además, genera reprocesos internos o extiende la interacción innecesariamente"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No usa / Uso apropiado de herramientas de información</button>
+
+
+            </div>
+          <!-- Select de si Cumple o no el item -->
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+              formControlName="item17">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-2  mt-3" name="Elegir"
+              formControlName="item18">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item19">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item20">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item21">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item22">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item23">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-2 mb-3" name="Elegir"
+              formControlName="item24">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2 mb-2" name="Elegir"
+              formControlName="item25">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+
+            </div>
+
+          </div>
+        </div>
+        <div class="col-1 bordeFormulario" style="padding: 11em 0; ">
+          <h1>{{porcentajeCrit6}}%</h1>
+          <button type="button" [disabled]="bloquearBoton6" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(6)">Restar</button>
+        </div>
+        <h1 class="col-1 bordeFormulario" style="padding: 8em 0">{{porcentajePilar2}}%</h1>
+
+
+
+        <div class="bordeFormulario">
+          <div class="col mt-3">
+            <h2 style="text-align: center">Impecabilidad</h2>
+          </div>
+        </div>
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <!-- Titulo -->
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+                Tiempo e información precisa
+              </h2>
+
+            <!-- Items y popover  -->
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Cuando se nos asigna el chat del cliente con los datos solicitados por el Bot, nuestra primera respuesta debe darse en el tiempo establecido en el manual de atención."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Envía primer mensaje en el tiempo estipulado.
+            </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button
+              matTooltip="Una vez iniciada la conversación entre el gestor y el cliente, debemos responder cada mensaje del cliente en en el tiempo establecido en el Manual de atención de Chat"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Responde mensajes durante la interacción en el tiempo estipulado.
+            </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Aplica para cuando:
+              1. el cliente escribe, es asignado a un gestor y este no atiende la interacción y el cliente abandona el chat.
+
+              2. Se está en conversación con el cliente y el gestor abandona el chat generando inconformidad en el cliente. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Gestor no abandona al cliente
+            </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="El gestor envía correctamente los 2 mensajes de inactividad del cliente
+
+              'mensaje 1: 1 hora' ,
+              'mensaje 2: 3 horas'
+
+              Después de este último mensaje el gestor cierra el chat por inactividad del cliente"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Cierra chat por abandono de cliente
+            </button>
+
+            <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Brindar información correcta
+            </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Brindar información Completa
+            </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No brinda información confidencial
+            </button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Aplica para procesos que solo se puedan realizar en tienda.
+
+              Si es un proceso de venta que el cliente desea finalizar en la tienda y no hay manejo de objeción, se analiza bajo el ítem: 'manejo de objeción para compra por WhatsApp'"
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Enviar al cliente a tienda cuando aplique.
+            </button>
+
+            <button class="col-12 mt-3 mb-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Cuando se presentan 4 o más errores de ortografía o redacción se afecta.
+              Si posee menos errores pero afecta la solución del cliente se afecta. "
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No posee errores Ortograficos o de redacción (Afectar si posee 4 o más)
+            </button>
+
+            <button class="col-12 mt-1 mb-2 bordeFormulario" type="button" mat-raised-button style="font-size:13px"
+              matTooltip="Se afecta cuando se utilizan emojis que propicien una conversación de violencia, acoso, sexualidad y ofensas raciales, étnicas o culturales."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Utilizar emojis apropiados
+            </button>
+
+
+            </div>
+          <!-- Select de si Cumple o no el item -->
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select  mb-2 mt-2 bordeFormulario" name="Elegir"
+              formControlName="item26">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mb-2  mt-3" name="Elegir"
+              formControlName="item27">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item28">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item29">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item30">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item31">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item32">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-3" name="Elegir"
+              formControlName="item33">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-2 " name="Elegir"
+              formControlName="item34">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario  mt-2 " name="Elegir"
+              formControlName="item35">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-1 bordePonderacion" style="padding: 16em 0;">
+          <h1>{{porcentajeCrit7}}%</h1>
+          <button type="button" [disabled]="bloquearBoton7" class="btn btn-outline-primary btn-sm" (click)="restarPorcentaje(7)">Restar</button>
+        </div>
+        <h1 class="col-1 bordePonderacion" style="padding: 10em 0">{{porcentajePilar3}}%</h1>
+
+        <div class="col-10 bordeFormulario">
+
+          <div class="row">
+            <div>
+
+            </div>
+            <h2 class="col-5 d-flex align-items-center justify-content-center bordeFormulario">
+            Actitud de servicio inapropiadas</h2>
+
+            <div class="col-5 bordeFormulario">
+              <button class="col-12 mt-2 bordeFormulario" type="button" mat-raised-button
+              matTooltip="1. No utiliza tecnicismos que den como resultado una incorrecta asesoría.
+              2. Confunde el nombre del cliente o sus solicitudes.
+              3. No utiliza palabras que denotes exclusión, racismo, violencia, sexualidad, acoso."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over" style="font-size: 12px">Se dirige de forma apropiada al cliente</button>
+
+              <button class="col-12 mt-3 bordeFormulario"  type="button" style="font-size: 12px" mat-raised-button
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No confronta Confrontar al cliente</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">No utiliza Lenguaje soez</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip=""
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Comentarios adversos a la empresa</button>
+
+              <button class="col-12 mt-3 bordeFormulario" type="button" style="font-size: 12px" mat-raised-button
+              matTooltip="Se toma como maltrato al cliente, demostrando que no se desea atender la interacción."
+              matTooltipPosition="above"
+              aria-label="Button that displays a tooltip when focused or hovered over">Terminar interacción antes de la solución / cierre de chart sin solución
+            </button>
+            </div>
+
+
+
+
+            <div class="col-sm-2 bordeFormulario">
+              <select class="form-select bordeFormulario mb-1 mt-1" name="Elegir"
+              formControlName="item36" >
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2" name="Elegir"
+              formControlName="item37">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-2" name="Elegir"
+              formControlName="item38">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3" name="Elegir"
+              formControlName="item39">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+              <select class="form-select bordeFormulario mt-3 mb-2" name="Elegir"
+              formControlName="item40">
+                <option value="Cumple" style="text-align: center">Cumple</option>
+                <option value="No Cumple" style="text-align: center">No Cumple</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <h1 class="col-1 bordePonderacion" style=" border-bottom: #55accf 2px solid"></h1>
+        <h1 class="col-1 bordePonderacion" style="top: 5em 0; border-bottom: #55accf 2px solid"></h1>
+    </div>
+  </ng-template>
+</form>

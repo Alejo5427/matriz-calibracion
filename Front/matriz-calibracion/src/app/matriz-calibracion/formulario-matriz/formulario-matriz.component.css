@@ -1,0 +1,28 @@
+
+.alineacionTexto{
+border: 1px solid;
+
+}
+
+.bordeFormulario {
+  border: 1px solid rgb(85, 172, 207);
+  margin: 0%;
+  text-align: center;
+}
+
+.bordePonderacion {
+  border: 2px solid #55accf;
+  margin: 0%;
+  text-align: center;
+  border-top: white 10px;
+  border-bottom:white  10px;
+}
+
+.example-form {
+  min-width: 400px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}

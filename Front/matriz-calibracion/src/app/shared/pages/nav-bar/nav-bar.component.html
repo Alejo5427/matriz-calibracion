@@ -1,0 +1,98 @@
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(104, 202, 240); border-radius: 20px">
+  <div class="container-fluid">
+    <!-- Logo puesto -->
+    <img src="../../../../assets/Fájate.png" alt="" width="24" height="24">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" dat a-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    </button>
+    <div class="collapse navbar-collapse align-items-center justify-content-center mt" id="navbarNavDropdown">
+      <!-- Link a formulario -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link col"
+          routerLink="/matrizCalibracion/Formulario"
+          style="color: white"
+          >Formulario</a>
+        </li>
+        <!-- Link a estadisticas -->
+        <li class="nav-item col">
+          <a class="nav-link col"
+          routerLink='/matrizCalibracion/Estadisticas'
+          routerLinkActive="active"
+          style="color: white">Estadísticas</a>
+        </li>
+        <!-- Link de Ajustes -->
+          <button class="btn btn-sm" mat-button [matMenuTriggerFor]="menu" style="color: white; " *ngIf="editar">Ajustes</button>
+          <!-- Boton de Angular material -->
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item
+            routerLink="/matrizCalibracion/Ajustes"
+            routerLinkActive="active">Configuración</button>
+            <button mat-menu-item data-bs-toggle="modal" data-bs-target="#modalCambioPassword">Crear Usuario</button>
+            <!-- Modal de cambio de contraseña -->
+              <div class="modal fade" id="modalCambioPassword" tabindex="-1" aria-labelledby="modalCambioPassword" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="modalCambioPassword"></h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Formulario de inicio de sesión -->
+                      <form #validarFormUsuario="ngForm" [formGroup]="formCrearUsuario" class="col-12" style="align-items: center" (ngSubmit)="crearUsuario()">
+                        <div>
+                          <div class="card mt-5" style=" border: 2px solid rgb(85, 172, 207);">
+                            <!-- Card de creacion de usuario -->
+                            <div class="card-body">
+                              <h2 class="card-title mb-4">Crear Usuario</h2>
+                                <div class="mb-3">
+                                  <!-- Campo de cedula -->
+                                  <label for="Cedula" class="form-label">Cédula</label>
+                                  <input formControlName="Cedula" type="number" class="form-control" id="Cedula"  required>
+                                </div>
+                                <div class="mb-3">
+                                  <!-- Campo de usuario -->
+                                  <label for="Usuario" class="form-label">Nombre</label>
+                                  <input  formControlName="Usuario" class="form-control" id="Usuario"   required>
+
+                                </div>
+                                <div class="mb-3">
+                                  <!-- Campo de contraseña  -->
+                                  <label for="Contrasena" class="form-label">Contraseña</label>
+                                  <input formControlName="Contrasena" type="password" class="form-control" id="Contrasena"  required>
+                                </div>
+                                <div class="mb-3">
+                                  <!-- Seleccion de roles -->
+                                  <label for="Rol" class="form-label">Elegir Rol</label>
+                                  <div>
+                                    <select formControlName="Rol" class="form-select  mb-3 mt-1" name="">
+                                      <option  value="Admin" style="text-align: center">Administrador</option>
+                                      <option  value="Evaluador" style="text-align: center">Evaluador</option>
+                                      <option  value="Gestor" style="text-align: center">Gestor</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block" style="text-align: center;"  [disabled]="!validarFormUsuario.valid">Crear Usuario</button>
+                              <!-- Fin del formulario -->
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </mat-menu>
+      </ul>
+    </div>
+    <!-- Cierre de sesion -->
+    <div>
+      <button class="btn btn-sm" mat-button  style="color: white;" (click)="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+  </div>
+</nav>
+
+

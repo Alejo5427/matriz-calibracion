@@ -1,0 +1,36 @@
+
+<form [formGroup]="formLogin" (ngSubmit)="inicioSesion()">
+
+  <div class="container2">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <img src="../../../assets/Fájate.png" alt="Logo de la empresa" class="img-fluid" style="width: 50%;">
+              </div>
+              <h2 class="card-title mb-4">Iniciar Sesión  Matriz Calibración</h2>
+              <!-- Formulario de inicio de sesión -->
+                <div class="mb-3">
+                  <label for="Usuario" class="form-label">Cedula</label>
+                  <input type="number"  formControlName="Usuario" class="form-control" id="Usuario"   required>
+                </div>
+                <div class="mb-3">
+                  <label for="Contrasena" class="form-label">Contraseña</label>
+                  <input formControlName="Contrasena" type="password" class="form-control" id="Contrasena"  required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="text-align: center;">Iniciar Sesión</button>
+
+              <!-- Fin del formulario -->
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</form>

@@ -1,0 +1,204 @@
+<!-- Muestra del navbar en la parte superior -->
+<div class="col">
+  <shared-nav-bar></shared-nav-bar>
+</div>
+
+<!-- Titulo de estadisticas -->
+<hr>
+<div class="row" style="text-align: center">
+  <h2 class="col-12"> Ajustes</h2>
+</div>
+<hr>
+
+ <!-- Tabla que contiene los usuarios Habilitados -->
+<div class="col-12">
+  <h2> Usuarios habilitados </h2>
+  <table mat-table [dataSource]="informacionUsuario" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="Posicion">
+      <th mat-header-cell *matHeaderCellDef> </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.posicion}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Nombre">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.Usuario}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Rol">
+      <th mat-header-cell *matHeaderCellDef> Rol </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.Roll}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Editar">
+      <th mat-header-cell *matHeaderCellDef> Editar Usuario</th>
+      <!-- Boton de edicion de usuario, este desplegara un modal que mostrara el formulario para editar datos -->
+      <td mat-cell *matCellDef="let datos"><button type="button" class="btn btn-outline-primary " data-bs-toggle="modal" data-bs-target="#modalEditUsuario" (click)="obtenerID(datos.id)">
+        Editar
+      </button> </td>
+    </ng-container>
+
+
+        <ng-container matColumnDef="Estado">
+          <th mat-header-cell *matHeaderCellDef> Estado Usuario  </th>
+          <td mat-cell *matCellDef="let datos">
+            <!-- Boton que desplegara el modal con el formulario de cambio de estado ademas de desembocar la funcion de obtencion la id requerida -->
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalEstadoUsuario" (click)="obtenerID(datos.id)">
+              Cambiar
+            </button>
+
+          </td>
+        </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="columnasUsuarios"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnasUsuarios;"></tr>
+  </table>
+</div>
+
+<div class="col-12 mt-5 mb-5">
+  <h2> Usuarios Inhabilitados </h2>
+  <table mat-table [dataSource]="informacionUsuarioInhabilitado" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="Posicion">
+      <th mat-header-cell *matHeaderCellDef> </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.posicion}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Nombre">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.Usuario}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Rol">
+      <th mat-header-cell *matHeaderCellDef> Rol </th>
+      <td mat-cell *matCellDef="let datos"> {{datos.Roll}} </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="Editar">
+      <th mat-header-cell *matHeaderCellDef> Editar Usuario </th>
+      <!-- Boton que desplegara el modal de edicion de usuario ademas de invocar la funcion de obtencion de id -->
+      <td mat-cell *matCellDef="let datos"> <button type="button" class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalEditUsuario" (click)="obtenerID(datos.id)">
+        Editar
+      </button> </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Estado">
+      <th mat-header-cell *matHeaderCellDef> Estado Usuario</th>
+      <td mat-cell *matCellDef="let datos">
+        <!-- Boton que desplegara el modal de cambio de estado de usuario y invocar la funcion de la obtencion del id -->
+        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalEstadoUsuario" (click)="obtenerID(datos.id)">
+          Cambiar
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnasUsuarios"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnasUsuarios;"></tr>
+  </table>
+</div>
+
+<hr>
+
+<!-- Modal sobre el cambio de estado de usuarios -->
+<div class="modal fade" id="modalEstadoUsuario" tabindex="-1" aria-labelledby="modalEstadoUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="modalEstadoUsuarioLabel">Usuarios </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulario con reactive Forms  -->
+        <form #validarFormEstadoUsuario="ngForm" [formGroup]="formEstadoUsuario" class="col-12" style="align-items: baseline" (ngSubmit)="cambioEstadoUsuario()">
+          <div class="">
+            <div class="card mt-5" style=" border: 2px solid rgb(85, 172, 207);">
+              <div class="card-body">
+                <h2 class="card-title mb-4">Estado usuario</h2>
+                  <div class="mb-3">
+                    <!-- Campo de cambio de estado de usuario -->
+                    <label for="estado" class="form-label">Estado</label>
+                    <div>
+                      <select formControlName="estado" class="form-select  mb-3 mt-1" name="" required>
+                        <option  value="1" style="text-align: center">Habilitado</option>
+                        <option  value="0" style="text-align: center">Inhabilitado</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Envio de informacion -->
+                  <button type="submit" class="btn btn-primary btn-block" style="text-align: center;" [disabled]="!validarFormEstadoUsuario.valid">Cambiar estado</button>
+                  </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de edicion de usuarios -->
+<div class="modal fade" id="modalEditUsuario" tabindex="-1" aria-labelledby="modalEditUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditUsuarioLabel">Usuarios </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #validarFormEditarUsuario="ngForm" [formGroup]="formEditarUsuario" class="col-12" style="align-items: baseline" (ngSubmit)="editarUsuario()">
+          <div class="">
+            <div class="card mt-5" style=" border: 2px solid rgb(85, 172, 207);">
+              <div class="card-body">
+                <h2 class="card-title mb-4">Editar usuario</h2>
+                <!-- Formulario Editar usuario -->
+                  <div class="mb-3">
+                    <!-- Campo de cedula -->
+                    <label for="CedulaEdit" class="form-label">Cedula</label>
+                    <input formControlName="CedulaEdit" type="number" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <!-- Campo nombre -->
+                    <label for="UsuarioEdit" class="form-label">Nombre</label>
+                    <input  formControlName="UsuarioEdit" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <!-- Campo de contraseña -->
+                    <label for="ContrasenEdit" class="form-label">Contraseña</label>
+                    <input formControlName="ContrasenaEdit" type="password" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <!-- Campo de cambiar rol -->
+                    <label for="RolEdit" class="form-label">Elegir Rol</label>
+                    <div>
+                      <select formControlName="RolEdit" class="form-select  mb-3 mt-1">
+                        <option  value="Admin" style="text-align: center">Administrador</option>
+                        <option  value="Evaluador" style="text-align: center">Evaluador</option>
+                        <option  value="Gestor" style="text-align: center">Gestor</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Boton para enviar la informacion                                           Boton para deshabilitar el guardado -->
+                  <button type="submit" class="btn btn-primary btn-block" style="text-align: center;" [disabled]="!validarFormEditarUsuario.valid">Editar Usuario</button>
+
+                </div>
+            </div>
+          </div>
+        </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
